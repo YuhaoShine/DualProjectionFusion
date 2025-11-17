@@ -1,13 +1,14 @@
 # DualProjectionFusion
+
 # This repository contains the official implementation of the following paper:
 
-# Dual-Projection Fusion for Accurate Upright Panorama Generation in Robotic Vision
-# *Yuhao Shan, Qianyi Yuan, Jingguo Liu, Shigang Li, Jianfeng Li, Tong Chen*  
-# **Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn)  
+**Dual-Projection Fusion for Accurate Upright Panorama Generation in Robotic Vision**
+*Yuhao Shan, Qianyi Yuan, Jingguo Liu, Shigang Li, Jianfeng Li, Tong Chen*  
+**Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn)  
 
-# **Status:** Submitted to *The Visual Computer* (Under Review)  
+**Status:** Submitted to *The Visual Computer* (Under Review)  
 
-# Abstract: Panoramic cameras, capable of capturing a 360-degree field of view, are crucial in robotic vision, particularly in environments with sparse features. However, non-upright panoramas due to unstable robot postures hinder downstream tasks. Traditional IMU-based correction methods suffer from drift and external disturbances, while vision-based approaches offer a promising alternative. This study presents a dual-stream angle-aware generation network that jointly estimates camera inclination angles and reconstructs upright panoramic images. The network comprises a CNN branch that extracts local geometric structures from equirectangular projections and a ViT branch that captures global contextual cues from cubemap projections. These are integrated through a dual-projection adaptive fusion module that aligns spatial features across both domains. To further enhance performance, we introduce a high-frequency enhancement block, circular padding, and channel attention mechanisms to preserve 360° continuity and improve geometric sensitivity. Experiments on the SUN360 and M3D datasets demonstrate that our method outperforms existing approaches in both inclination estimation and upright panorama generation. Ablation studies further validate the contribution of each module and highlight the synergy between the two tasks. 
+Abstract: Panoramic cameras, capable of capturing a 360-degree field of view, are crucial in robotic vision, particularly in environments with sparse features. However, non-upright panoramas due to unstable robot postures hinder downstream tasks. Traditional IMU-based correction methods suffer from drift and external disturbances, while vision-based approaches offer a promising alternative. This study presents a dual-stream angle-aware generation network that jointly estimates camera inclination angles and reconstructs upright panoramic images. The network comprises a CNN branch that extracts local geometric structures from equirectangular projections and a ViT branch that captures global contextual cues from cubemap projections. These are integrated through a dual-projection adaptive fusion module that aligns spatial features across both domains. To further enhance performance, we introduce a high-frequency enhancement block, circular padding, and channel attention mechanisms to preserve 360° continuity and improve geometric sensitivity. Experiments on the SUN360 and M3D datasets demonstrate that our method outperforms existing approaches in both inclination estimation and upright panorama generation. Ablation studies further validate the contribution of each module and highlight the synergy between the two tasks. 
 
 # This work is currently under review. The code is provided to support the review process and ensure reproducibility.
 
