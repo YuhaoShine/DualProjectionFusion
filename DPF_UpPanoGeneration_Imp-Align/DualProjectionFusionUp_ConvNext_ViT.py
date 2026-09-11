@@ -30,25 +30,27 @@ class DualProjectionFusionUp:
         self.log_path = os.path.join(self.settings.log_dir, self.settings.model_name)
 
         # data
-        self.dataset = datasets.loadDataLUT
+        self.datasetTrain = datasets.loadTrainDataLUT
+        self.datasetValTest = datasets.loadDataLUT
+        
         ## SUN360toy
-        train_file_list = './datasets/SUN360_RGBLUT_PitchRoll_toylabel.txt' ## SUN360_RGBLUT_PitchRoll_trainlabel
-        val_file_list = './datasets/SUN360_RGBLUT_PitchRoll_toylabel.txt'  ## SUN360_RGBLUT_PitchRoll_vallabel
-        test_file_list = './datasets/SUN360_RGBLUT_PitchRoll_toylabel.txt' ## SUN360_RGBLUT_PitchRoll_testlabel
+        train_file_list = './datasets/SUN360_RGBLUT_PitchRoll_trainlabel.txt' ## SUN360_RGBLUT_PitchRoll_trainlabel
+        val_file_list = './datasets/SUN360_RGBLUT_PitchRoll_vallabel.txt'  ## SUN360_RGBLUT_PitchRoll_vallabel
+        test_file_list = './datasets/SUN360_RGBLUT_PitchRoll_testlabel.txt' ## SUN360_RGBLUT_PitchRoll_testlabel
         
         ## 训练集
-        train_dataset = self.dataset(self.settings.data_path, train_file_list) 
+        train_dataset = self.datasetTrain(self.settings.data_path, train_file_list) 
         self.train_loader = DataLoader(train_dataset, self.settings.batch_size, True,
                                        num_workers=self.settings.num_workers, pin_memory=True, drop_last=True)       
         num_train_samples = len(train_dataset)
         self.num_total_steps = num_train_samples // self.settings.batch_size * self.settings.num_epochs
         ## 验证集
-        val_dataset = self.dataset(self.settings.data_path, val_file_list)
+        val_dataset = self.datasetValTest(self.settings.data_path, val_file_list)
         
         self.val_loader = DataLoader(val_dataset, self.settings.batch_size_test, False,
                                      num_workers=self.settings.num_workers, pin_memory=True, drop_last=False)
         ## 测试集
-        test_dataset = self.dataset(self.settings.data_path, test_file_list)
+        test_dataset = self.datasetValTest(self.settings.data_path, test_file_list)
         
         self.test_loader = DataLoader(test_dataset, self.settings.batch_size_test, False,
                                      num_workers=self.settings.num_workers, pin_memory=True, drop_last=False)
@@ -60,14 +62,32 @@ class DualProjectionFusionUp:
         Net = Model_dict["TwoBranchConvNextViT"]
 
         self.model = Net(image_height=self.settings.height, image_width=self.settings.width)  
-          
         
+        
+        ############################################################################################################################################
+        model_loadpath='G:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\GLPanoUpright\\models\\weights_7\\model.pth' 
+        # optimizer_load_path='.\\Pretrainned_weights\\adam.pth'
+        ############################################################################################################################################         
+        # 加载模型
+        model_dict = self.model.state_dict()
+        pretrained_dict = torch.load(model_loadpath)
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        self.model.load_state_dict(model_dict)
+        ############################################################################################################################################
+
         self.model.to(self.device)
         self.parameters_to_train = list(self.model.parameters())
-        self.optimizer = optim.Adam(self.parameters_to_train, self.settings.learning_rate)
+        # self.optimizer = optim.Adam(self.parameters_to_train, self.settings.learning_rate)
+        self.optimizer = optim.Adam(self.parameters_to_train, 1e-5)
+               
+        ############################################################################################################################################
+        # # 加载优化器
+        # optimizer_dict = torch.load(optimizer_load_path)
+        # self.optimizer.load_state_dict(optimizer_dict)
+        ############################################################################################################################################
         
         
-
         if self.settings.load_weights_dir is not None:
             self.load_model()
 
@@ -94,40 +114,68 @@ class DualProjectionFusionUp:
     def train(self):
         """Run the entire training pipeline
         """
-        self.step = 0
-        for self.epoch in range(0, self.settings.num_epochs):
+        self.step = 8 * len(self.train_loader) 
+        for self.epoch in range(8, self.settings.num_epochs):
             self.train_one_epoch() ####
             self.validate()
             if (self.epoch + 1) % self.settings.save_frequency == 0:
                 self.save_model()
-
-    ########################################################################################################    
+                
     def train_one_epoch(self):
         """Run a single epoch of training
         """
-        self.model.train() ####
-        
+        self.model.train()
+
         pbar = tqdm.tqdm(self.train_loader)
         pbar.set_description("Training Epoch_{}".format(self.epoch))
-        
+
+        # ===== 新增：累计loss =====
+        total_loss_ang = 0.0
+        total_loss_lut = 0.0
+        total_loss_feel = 0.0
+        total_loss_all = 0.0
+        batch_count = 0
+
         for batch_idx, inputs in enumerate(pbar):
-            outputs, losses = self.forward_batch(inputs) 
+
+            outputs, losses = self.forward_batch(inputs)
+
             self.optimizer.zero_grad()
             losses["losses"].backward()
             self.optimizer.step()
-            
-            self.step += 1 
-        print('当前LOSS输出： ', losses)
-        
+
+            # ===== 累计loss =====
+            total_loss_ang += losses["loss_Ang"].detach().cpu().item()
+            total_loss_lut += losses["loss_LUT"].detach().cpu().item()
+            total_loss_feel += losses["IMG_feel"].detach().cpu().item()
+            total_loss_all += losses["losses"].detach().cpu().item()
+
+            batch_count += 1
+            self.step += 1
+
+        # ===== 计算平均loss =====
+        avg_loss_ang = total_loss_ang / batch_count
+        avg_loss_lut = total_loss_lut / batch_count
+        avg_loss_feel = total_loss_feel / batch_count
+        avg_loss_all = total_loss_all / batch_count
+
+        print('当前Epoch平均LOSS： ', 
+              np.round(avg_loss_ang,2),
+              np.round(avg_loss_lut,2),
+              np.round(avg_loss_feel,2),
+              np.round(avg_loss_all,2))
+
         #################################################################################################### 
-        with open('H:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\LossesSAVE.txt', 'a') as file:
-            loss_Ang=np.round(losses["loss_Ang"].detach().cpu().numpy(),2)
-            LossesLUT=np.round(losses["loss_LUT"].detach().cpu().numpy(),2)
-            LossesFeel=np.round(losses["IMG_feel"].detach().cpu().numpy(),2)
-            LossesALL=np.round(losses["losses"].detach().cpu().numpy(),2)
+        with open('G:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\LossesSAVE.txt', 'a') as file:
+
+            loss_Ang = np.round(avg_loss_ang,2)
+            LossesLUT = np.round(avg_loss_lut,2)
+            LossesFeel = np.round(avg_loss_feel,2)
+            LossesALL = np.round(avg_loss_all,2)
+
             file.write(str(loss_Ang)+'----'+str(LossesLUT)+'----'+str(LossesFeel)+'----'+str(LossesALL) + "\n")
         ####################################################################################################
-
+    
     ########################################################################################################
     def forward_batch(self, inputs):
         for key, ipt in inputs.items():
@@ -144,7 +192,8 @@ class DualProjectionFusionUp:
         
         ##################################################################################################
         criterionSmoothL1 = torch.nn.SmoothL1Loss()
-        flowSrc = self.pre_rota(6,256,512) 
+        B, _, H, W = equi_inputs.shape
+        flowSrc = self.pre_rota(B, H, W) 
         p_r_Pred = fus_result["PitchRoll_norm_pred"]
         p_r_gt = inputs["PitchRollAng"]
         ################################################################# 
@@ -164,16 +213,16 @@ class DualProjectionFusionUp:
         pdLUT=fus_result["pred_Upright"]
         pdLUT = pdLUT.permute(0,2,3,1)
            
-        with torch.no_grad():
-            NeedOutputs=self.grid_sampleLUT(pdLUT)
-            pdUPIMG = F.grid_sample(equi_inputs, NeedOutputs["needLUT"], mode='bilinear', padding_mode='border', align_corners=True)
-            gtUpIMG=inputs["normalized_rgb_Upright"]
-            pingfanghe=NeedOutputs["pingfangheALL"]
-            B, C, H, W = equi_inputs.shape
-            ones_tensor = torch.ones(B, H, W).cuda()
-
+        # Differentiable LUT-based resampling (kept in the autograd graph)
+        gtUpIMG = inputs["normalized_rgb_Upright"]
+        # predicted LUT is expected to be (B, 3, H, W)
+        needLUT = self.warp3Dflow(fus_result["pred_Upright"])  # (B, H, W, 2) in [-1, 1]
+        pdUPIMG = F.grid_sample(equi_inputs, needLUT, mode='bilinear', padding_mode='border', align_corners=True)
+        # Unit sphere constraint: ||(x,y,z)||_2 should be 1 for each pixel
+        pingfanghe = (fus_result["pred_Upright"] ** 2).sum(dim=1)  # (B, H, W)
+        ones_tensor = torch.ones_like(pingfanghe)
         LUT_L2_loss = self.MSE_loss(gt_Upright.float(), fus_result["pred_Upright"].float())
-        UnitSphereLoss = self.L1_loss(pingfanghe.float(),ones_tensor.float())
+        UnitSphereLoss = self.L1_loss(pingfanghe.float(), ones_tensor.float())
         IMG_L1_loss = self.L1_loss(pdUPIMG.float(), gtUpIMG.float())
         LPIPSs = self.lpips_model(gtUpIMG.float(), pdUPIMG.float())
         LPI=LPIPSs.squeeze()
@@ -181,7 +230,7 @@ class DualProjectionFusionUp:
         PSNR=self.calculate_psnr(gtUpIMG.float(), pdUPIMG.float()) 
         PSNR_Loss=10*torch.reciprocal(PSNR) ## ????
         
-        losses["loss_LUT"] = (LUT_L2_loss.float() + UnitSphereLoss.float() + IMG_L1_loss.float() +IMG_L1_loss.float())*10
+        losses["loss_LUT"] = (LUT_L2_loss.float() + UnitSphereLoss.float() + IMG_L1_loss.float())*10
         losses["IMG_feel"] = (LPI_Loss + PSNR_Loss)*10       
         
         
@@ -197,7 +246,7 @@ class DualProjectionFusionUp:
         """
         self.model.eval()
         
-        saver = Saver('H:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\IMGcheckBackbone\\')
+        saver = Saver('G:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\IMGcheckBackbone\\')
         self.evaluator.reset_eval_metrics()
 
         pbar = tqdm.tqdm(self.val_loader)
@@ -226,19 +275,13 @@ class DualProjectionFusionUp:
                 pred_Up = fus_result["pred_Upright"].detach()
 
                 self.evaluator.compute_eval_metrics(gt_Upright, pred_Up, self.lpips_model)
-                ################################################
-                
-                
-                
+                ################################################          
                 
                 ############################################################################### 
                 errNow=(fus_result["PitchRoll_norm_pred"]-inputs["PitchRollAng"]).detach().cpu().numpy() 
                 Err.append(abs(errNow)) ####
                 ###############################################################################
-                
-                
-                
-                
+  
                 
                 for i in range(gt_Upright.shape[0]):
                     self.evaluator.compute_eval_metrics(gt_Upright[i:i + 1], pred_Up[i:i + 1], self.lpips_model)
@@ -253,10 +296,7 @@ class DualProjectionFusionUp:
                     
                     print("角度真值：", inputs["PitchRollAng"])
                     print("FUS预测：", fus_result["PitchRoll_norm_pred"])
-                    
-                    
-                    
-                    
+                              
                     
         ############################################################################### 
         Err=np.array(Err) 
@@ -264,11 +304,11 @@ class DualProjectionFusionUp:
         minErr=str(np.round(np.min(Err,0),2)).replace("[[","").replace("]]","") 
         maxErr=str(np.round(np.max(Err,0),2)).replace("[[","").replace("]]","")
         medErr=str(np.round(np.median(Err,0),2)).replace("[[","").replace("]]","")
-        with open('H:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\ValAngErrSAVE.txt', 'a') as file:
+        with open('G:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\ValAngErrSAVE.txt', 'a') as file:
             file.write(minErr+'----'+medErr+'----'+maxErr+'----'+meanErr+ "\n")
         ###############################################################################
             
-        self.evaluator.print(self.epoch, 'H:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\') #####
+        self.evaluator.print(self.epoch, 'G:\\DPF_UpPanoGeneration_Imp-Align\\experiments_Upright_LOG\\') #####
         
         del inputs, fus_result #, P_R_pre_by_Conv
         
@@ -354,9 +394,9 @@ class DualProjectionFusionUp:
         fai_new = fai_new + fai_2
 
         x_new = fai_new * 512 / 2. / 3.1416  # (4, 1, 256, 512)
-        x_new[x_new < 1] = 1
+        x_new = torch.clamp(x_new, min=1.0)
         y_new = theta_new * 256 / 3.1416  # (4, 1, 256, 512)
-        y_new[y_new < 1] = 1
+        y_new = torch.clamp(y_new, min=1.0)
 
         lut = torch.cat([y_new, x_new], dim=1)  # (4, 2, 256, 512)
         rota_lut1 = torch.zeros((flownorm.size(0), 256, 512, 2)).cuda()
@@ -364,23 +404,23 @@ class DualProjectionFusionUp:
         rota_lut1[:, :, :, 0] = (lut[:, 1, :, :] - 256) / 256.
         return rota_lut1
     ########################################################################################################    
-    def grid_sampleLUT(self, predLUT): # bs*256*512*3
-        predLUT=predLUT.detach().cpu()
-        Lshape=predLUT.shape
-        pingfangheALL=np.empty((Lshape[0],Lshape[1],Lshape[2]))
-        for bs in range(Lshape[0]):
-            NowLUT=predLUT[bs,:,:,:]
-            pingfangheALL[bs,:,:]=NowLUT[:,:,0]**2+NowLUT[:,:,1]**2+NowLUT[:,:,2]**2
-        needLUT=self.warp3Dflow(predLUT.permute(0, 3, 1, 2))
-        pingfangheALL=pingfangheALL.astype(np.float32)
-        pingfangheALL=torch.from_numpy(pingfangheALL)
-        pingfangheALL=pingfangheALL.cuda()
-        needLUT=needLUT.cuda() 
-        NeedOutputs={}
-        NeedOutputs["needLUT"]=needLUT
-        NeedOutputs["pingfangheALL"]=pingfangheALL
-        
-        return NeedOutputs
+    def grid_sampleLUT(self, predLUT):
+        """Create a sampling grid (needLUT) and unit-sphere norm map from predicted 3D LUT.
+
+        predLUT: (B, H, W, 3) or (B, 3, H, W). This function is differentiable if predLUT
+        participates in autograd (no detach / numpy). In validation we typically call it under
+        torch.no_grad() for efficiency.
+        """
+        if predLUT.dim() == 4 and predLUT.shape[-1] == 3:
+            pred_flow = predLUT.permute(0, 3, 1, 2)  # (B,3,H,W)
+        elif predLUT.dim() == 4 and predLUT.shape[1] == 3:
+            pred_flow = predLUT  # (B,3,H,W)
+        else:
+            raise ValueError(f"Unexpected predLUT shape: {tuple(predLUT.shape)}")
+
+        pingfangheALL = (pred_flow ** 2).sum(dim=1)  # (B,H,W)
+        needLUT = self.warp3Dflow(pred_flow)         # (B,H,W,2)
+        return {"needLUT": needLUT, "pingfangheALL": pingfangheALL}
  
 ####################################################################################################################################
     def save_settings(self):
