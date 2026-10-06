@@ -12,8 +12,7 @@ Abstract:  Panoramic cameras provide a 360° field of view and are widely used i
 
 # This work is currently under review. The code is provided to support the review process and ensure reproducibility.
 
-
-<img width="840" height="470" alt="image" src="https://github.com/user-attachments/assets/eedf7aeb-d09d-4115-8ae6-7fa984c261e7" />
+<img width="1365" height="873" alt="image" src="https://github.com/user-attachments/assets/1fa6735d-4bb8-4e36-b52c-b108dde22c4e" />
 
 pip install -r requirements.txt
 
