@@ -20,10 +20,7 @@ pip install -r requirements.txt
 
 ## Reproducibility
 
-The random seed used for the experiments reported in the paper is:
-
-```text
-seed = 100
+The random seed used for the experiments reported in the paper is: 100
 
 **Code for SUN360 Dataset：**
 1) DPF_UpPanoGeneration_Imp-Align: Implicit Data-Driven Alignment
