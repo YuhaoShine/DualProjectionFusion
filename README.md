@@ -1,12 +1,12 @@
 # DualProjectionFusion
 
-# This repository contains the official implementation of the following paper:
+This repository contains the official implementation of the following paper:
 
 **Learning Projection-Aware 360-Degree Image Rectification via Dual-Projection Fusion**
 *Yuhao Shan, Qianyi Yuan, Jingguo Liu, Shigang Li, Jianfeng Li, Tong Chen*  
 **Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn)  
 
-**Status:** Submitted to *The Visual Computer* (Under Review)  
+**Status:** Revised manuscript submitted to The Visual Computer (Under Review) 
 
 Abstract:  Panoramic cameras provide a 360° field of view and are widely used in panoramic vision, immersive visual computing, and robotic perception. However, changes in camera orientation can produce non-upright panoramas, introducing geometric variations that can complicate downstream visual analysis. Existing vision-based rectification methods usually operate within a single projection domain, limiting their ability to jointly exploit local geometric structures and global contextual information. To address this, we formulate 360° image rectification as a projection-aware representation learning problem and propose a dual-projection framework for upright panoramic rectification. A convolutional neural network branch captures local geometric structures from equirectangular projection (ERP) inputs, while a vision transformer branch models global contextual cues from cubemap projections. Cross-projection feature transformation and multi-level feature fusion enable effective interaction between these complementary representations. The learned representation supports collaborative inclination estimation and upright panorama generation, with the two tasks providing complementary geometric and appearance supervision. Experiments on SUN360 and M3D show consistent improvements over existing methods, achieving accuracies within a 1° error threshold of 65.9% and 85.2% and Fréchet Inception Distance scores of 5.87 and 3.26, respectively. Ablation studies verify the contributions of dual-projection representation, cross-projection feature transformation and fusion, and collaborative multi-task learning. The proposed framework provides a projection-aware visual computing approach for panoramic rectification. 
 
@@ -14,16 +14,26 @@ Abstract:  Panoramic cameras provide a 360° field of view and are widely used i
 
 <img width="1365" height="873" alt="image" src="https://github.com/user-attachments/assets/1fa6735d-4bb8-4e36-b52c-b108dde22c4e" />
 
+**Environment / Installation:**
+The experiments were conducted using Python and PyTorch on an NVIDIA RTX 3090 GPU.
 pip install -r requirements.txt
+
+## Reproducibility
+
+The random seed used for the experiments reported in the paper is:
+
+```text
+seed = 100
 
 **Code for SUN360 Dataset：**
 1) DPF_UpPanoGeneration_Imp-Align: Implicit Data-Driven Alignment
 2) DPF_UpPanoGeneration_Exp-Align: Explicit Geometric Alignment
 
-For train, run "DualProjectionFusionUp_ConvNext_ViT.py".
-For test, please following the step in ".\DPF_UpPanoGeneration_Imp-Align\Test_Result\results\introduction.txt"
+**For train, run "DualProjectionFusionUp_ConvNext_ViT.py".**
 
-Datasets and pretrainned models for SUN360 can be find in：
+**For test, please following steps in ".\DPF_UpPanoGeneration_Imp-Align\Test_Result\results\introduction.txt"**
+
+**Datasets and pretrainned models for SUN360 can be found in：**
 Link: https://pan.baidu.com/s/14qgkAhhq9zJXTE5pUj9lGA?pwd=p9az Code: p9az 
 
 **1)	Inclination angle Estimation Task**
@@ -42,18 +52,20 @@ Link: https://pan.baidu.com/s/14qgkAhhq9zJXTE5pUj9lGA?pwd=p9az Code: p9az
 
 <img width="507" height="233" alt="image" src="https://github.com/user-attachments/assets/c340d566-b43d-4b28-81b7-622807a33f27" />
 
+## License
+
+This project is released under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 If you find this project useful in your research, please consider citing our paper:
 
 ```bibtex
-@article{shan2025dualprojection,
+@article{shan2026dualprojection,
   title={Learning Projection-Aware 360-Degree Image Rectification via Dual-Projection Fusion},
   author={Shan, Yuhao and Yuan, Qianyi and Liu, Jingguo and Li, Shigang and Li, Jianfeng and Chen, Tong},
   journal={Submitted to The Visual Computer},
   year={2026},
   note={Under Review}
 }
-
-(We will update the citation information with the official details upon acceptance.)
-
+```
+*The citation information will be updated with the official publication details upon acceptance.*
 
