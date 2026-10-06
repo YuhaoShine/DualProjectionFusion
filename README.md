@@ -2,13 +2,13 @@
 
 # This repository contains the official implementation of the following paper:
 
-**Dual-Projection Fusion for Accurate Upright Panorama Generation in Robotic Vision**
+**Learning Projection-Aware 360-Degree Image Rectification via Dual-Projection Fusion**
 *Yuhao Shan, Qianyi Yuan, Jingguo Liu, Shigang Li, Jianfeng Li, Tong Chen*  
 **Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn)  
 
 **Status:** Submitted to *The Visual Computer* (Under Review)  
 
-Abstract: Panoramic cameras, capable of capturing a 360-degree field of view, are crucial in robotic vision, particularly in environments with sparse features. However, non-upright panoramas due to unstable robot postures hinder downstream tasks. Traditional IMU-based correction methods suffer from drift and external disturbances, while vision-based approaches offer a promising alternative. This study presents a dual-stream angle-aware generation network that jointly estimates camera inclination angles and reconstructs upright panoramic images. The network comprises a CNN branch that extracts local geometric structures from equirectangular projections and a ViT branch that captures global contextual cues from cubemap projections. These are integrated through a dual-projection adaptive fusion module that aligns spatial features across both domains. To further enhance performance, we introduce a high-frequency enhancement block, circular padding, and channel attention mechanisms to preserve 360° continuity and improve geometric sensitivity. Experiments on the SUN360 and M3D datasets demonstrate that our method outperforms existing approaches in both inclination estimation and upright panorama generation. Ablation studies further validate the contribution of each module and highlight the synergy between the two tasks. 
+Abstract:  Panoramic cameras provide a 360° field of view and are widely used in panoramic vision, immersive visual computing, and robotic perception. However, changes in camera orientation can produce non-upright panoramas, introducing geometric variations that can complicate downstream visual analysis. Existing vision-based rectification methods usually operate within a single projection domain, limiting their ability to jointly exploit local geometric structures and global contextual information. To address this, we formulate 360° image rectification as a projection-aware representation learning problem and propose a dual-projection framework for upright panoramic rectification. A convolutional neural network branch captures local geometric structures from equirectangular projection (ERP) inputs, while a vision transformer branch models global contextual cues from cubemap projections. Cross-projection feature transformation and multi-level feature fusion enable effective interaction between these complementary representations. The learned representation supports collaborative inclination estimation and upright panorama generation, with the two tasks providing complementary geometric and appearance supervision. Experiments on SUN360 and M3D show consistent improvements over existing methods, achieving accuracies within a 1° error threshold of 65.9% and 85.2% and Fréchet Inception Distance scores of 5.87 and 3.26, respectively. Ablation studies verify the contributions of dual-projection representation, cross-projection feature transformation and fusion, and collaborative multi-task learning. The proposed framework provides a projection-aware visual computing approach for panoramic rectification. 
 
 # This work is currently under review. The code is provided to support the review process and ensure reproducibility.
 
@@ -37,10 +37,10 @@ If you find this project useful in your research, please consider citing our pap
 
 ```bibtex
 @article{shan2025dualprojection,
-  title={Dual-Projection Fusion for Accurate Upright Panorama Generation in Robotic Vision},
+  title={Learning Projection-Aware 360-Degree Image Rectification via Dual-Projection Fusion},
   author={Shan, Yuhao and Yuan, Qianyi and Liu, Jingguo and Li, Shigang and Li, Jianfeng and Chen, Tong},
   journal={Submitted to The Visual Computer},
-  year={2025},
+  year={2026},
   note={Under Review}
 }
 
