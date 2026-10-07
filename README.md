@@ -32,6 +32,8 @@ The random seed used for the experiments reported in the paper is: 100
 
 **Datasets and pretrainned models for SUN360 can be found in：**
 Link: https://pan.baidu.com/s/14qgkAhhq9zJXTE5pUj9lGA?pwd=p9az Code: p9az 
+**200-image real-world panoramic evaluation set can be downloaded from the following link:**
+Link: https://pan.baidu.com/s/1TCpFJ5pdT2z2Ck2a1bLcUA Code: v7k8
 
 **1)	Inclination angle Estimation Task**
 
