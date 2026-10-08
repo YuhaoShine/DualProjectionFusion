@@ -120,6 +120,18 @@ Link: https://drive.google.com/file/d/1mBvogvBe1JXJ4ZSsUssOUos69FDmGkqP/view?usp
 
 <img width="507" height="233" alt="image" src="https://github.com/user-attachments/assets/c340d566-b43d-4b28-81b7-622807a33f27" />
 
+The following scripts evaluate the runtime efficiency of the full `DPF_UpPanoGeneration_Imp-Align` model and its extracted angle-only inference path:
+
+- **`ForTEST_ImplicitFusion_full_runtime.py`**: evaluates the complete network forward pass, including both projection branches, feature fusion, and the LUT decoder.
+- **`ForTEST_ImplicitFusion_angle_only_runtime.py`**: evaluates the ERP encoder and angle-regression head extracted from the jointly trained full model.
+
+Place both files in the **`DPF_UpPanoGeneration_Imp-Align` directory, alongside `train.py`**. Configure the dataset and checkpoint paths before evaluation. Both files define the benchmark class `GLPanoDepth`; they must be imported by a launcher that supplies the required settings and calls `validate()`.
+
+For single-image latency measurements, set `batch_size_test=1`. Both scripts use 50 warm-up iterations followed by 200 timed iterations with CUDA Events, and report mean latency, standard deviation, FPS, computational complexity, parameter count, and parameter/buffer storage size.
+
+The measurements exclude data loading, input transfer, ERP-to-cubemap preprocessing, and post-forward LUT conversion and image resampling.
+
+
 ## License
 
 This project is released under the MIT License. See the [LICENSE](LICENSE) file for details.
