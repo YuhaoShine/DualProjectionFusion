@@ -4,7 +4,9 @@ This repository contains the official implementation of the following paper:
 
 **Learning Projection-Aware 360-Degree Image Rectification via Dual-Projection Fusion**
 *Yuhao Shan, Qianyi Yuan, Jingguo Liu, Shigang Li, Jianfeng Li, Tong Chen*  
-**Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn)  
+**Corresponding Author:** Yuhao Shan (shanyuhao@swu.edu.cn) 
+
+**Paper:** [arXiv](https://arxiv.org/submit/8201230/view)
 
 **Status:** Revised manuscript submitted to The Visual Computer (Under Review) 
 
