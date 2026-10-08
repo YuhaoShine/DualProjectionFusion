@@ -30,6 +30,31 @@ The random seed used for the experiments reported in the paper is: 100
 
 **For test, please following steps in ".\DPF_UpPanoGeneration_Imp-Align\Test_Result\results\introduction.txt"**
 
+
+## Pretrained Models and Additional Resources
+
+Pretrained model weights and additional reproduction resources are available through [GitHub Releases](https://github.com/YuhaoShine/DualProjectionFusion/releases), providing an alternative download source to Baidu Netdisk.
+
+| Model / experiment | Download and instructions |
+|---|---|
+| Implicit data-driven alignment | [Pretrained weights — Ours-Imp](https://github.com/YuhaoShine/DualProjectionFusion/releases/tag/DPF_UpPanoGeneration_Imp-Align) |
+| Explicit geometric alignment | [Pretrained weights — Ours-Exp](https://github.com/YuhaoShine/DualProjectionFusion/releases/tag/DPF_UpPanoGeneration) |
+| Noise-aware fine-tuning experiment reported in Table 13 | [Noise-aware fine-tuned model](https://github.com/YuhaoShine/DualProjectionFusion/releases/tag/NA_FINETUNED_MODEL_for_Table13) |
+| Noise-aware model for real-world RICOH THETA evaluation | [Model and additional testing/training resources](https://github.com/YuhaoShine/DualProjectionFusion/releases/tag/NA_Model_for_RealThetaIMG) |
+
+Please consult the corresponding release notes for the available files, model-specific instructions, and SHA-256 checksums where provided. Checksums must be matched to the exact downloaded filename.
+
+`model.pth` contains the model parameters, while `adam.pth`, where provided, contains the optimizer state for resuming training. The current evaluation scripts also load the optimizer state; follow the corresponding script requirements when preparing the files.
+
+Before running the scripts, configure the dataset, checkpoint, and output paths for your local environment. For installation and environment details, see [INSTALL.md](INSTALL.md).
+
+## Contact and Reproduction Support
+
+If you encounter difficulties downloading the resources or reproducing the results, please contact **Yuhao Shan** at [shanyuhao@swu.edu.cn](mailto:shanyuhao@swu.edu.cn).
+
+To help diagnose the issue, please include the release or model variant used, your operating system and Python/PyTorch versions, the command or script you ran, and the complete error message or traceback. Please also describe the dataset and checkpoint configuration relevant to the issue.
+
+
 **Datasets and pretrainned models for SUN360 can be found in：**
 
 Link: https://pan.baidu.com/s/14qgkAhhq9zJXTE5pUj9lGA?pwd=p9az Code: p9az 
