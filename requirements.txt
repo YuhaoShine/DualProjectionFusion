@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cu113
+
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.2
 aiosignal==1.4.0
@@ -216,8 +218,8 @@ timm==1.0.22
 tinycss2==1.4.0
 tomli==2.3.0
 tomlkit==0.13.3
-torch @ file:///H:/torch-1.12.0%2Bcu113-cp39-cp39-win_amd64.whl#sha256=e2e96f5c85b344f274cf3c934c36661db5871223f4ffe9c45d5f86a233103314
-torchvision @ file:///H:/torchvision-0.13.0%2Bcu113-cp39-cp39-win_amd64.whl#sha256=c7f8588281444070f9cdfe0a074882987eec21e5ccb290bcbac336a2a960e6d1
+torch==1.12.0+cu113
+torchvision==0.13.0+cu113
 tornado==6.5.2
 tqdm==4.67.1
 traitlets==5.14.3
