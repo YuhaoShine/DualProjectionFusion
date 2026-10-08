@@ -31,6 +31,45 @@ The random seed used for the experiments reported in the paper is: 100
 **For test, please following steps in ".\DPF_UpPanoGeneration_Imp-Align\Test_Result\results\introduction.txt"**
 
 
+## Extended Evaluation Metrics
+
+The extended angle and image evaluation scripts should be placed in:
+
+`./DPF_UpPanoGeneration_Imp-Align/Test_Result/results/`
+
+After generating the model predictions, run the scripts **from this directory**:
+
+```bat
+cd DPF_UpPanoGeneration_Imp-Align\Test_Result\results
+python AngleMetrics_extended_v3.py
+python ImageMetrics_extended_v3.py
+```
+
+### Angle Evaluation
+
+`AngleMetrics_extended_v3.py` reads:
+
+- `PitchRollAngGT.txt`: ground-truth pitch and roll angles in degrees.
+- `PitchRollAngPRED.txt`: predicted pitch and roll angles in degrees.
+
+Both files must contain the same number of samples, with corresponding samples in the same row order and pitch followed by roll.
+
+The script reports threshold accuracies and MAE, RMSE, median, and P95 of the scalar angular error. It also reports component-wise pitch/roll errors and optional SO(3) geodesic error statistics with yaw fixed to zero. These error definitions are reported separately and should not be treated as interchangeable.
+
+Per-sample results are saved to `angle_metrics_per_sample.csv`. Predictions are evaluated without additional rounding.
+
+### Image Evaluation
+
+`ImageMetrics_extended_v3.py` reads ground-truth upright images from `./gt_UpIMG/` and generated upright images from `./pre_UpIMG/`.
+
+Image pairs are matched using the numeric sample ID at the beginning of filenames, such as `IMG0_gt_UpIMG.jpg` and `IMG0_pre_UpIMG.jpg`. Corresponding images must have identical dimensions. Check the reported matched-pair and unmatched-file counts to confirm that the intended evaluation set is included.
+
+The script reports PSNR, SSIM, LPIPS (AlexNet, version 0.1), NRMSE, and NMAE, including their mean, standard deviation, and median. Per-sample results are saved to `image_metrics_per_sample.csv`.
+
+FID is evaluated separately using the existing `pytorch-fid` evaluation script.
+
+
+
 ## Pretrained Models and Additional Resources
 
 Pretrained model weights and additional reproduction resources are available through [GitHub Releases](https://github.com/YuhaoShine/DualProjectionFusion/releases), providing an alternative download source to Baidu Netdisk.
