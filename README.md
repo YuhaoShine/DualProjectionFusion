@@ -26,7 +26,7 @@ The random seed used for the experiments reported in the paper is: 100
 1) DPF_UpPanoGeneration_Imp-Align: Implicit Data-Driven Alignment
 2) DPF_UpPanoGeneration_Exp-Align: Explicit Geometric Alignment
 
-**For train, run "DualProjectionFusionUp_ConvNext_ViT.py".**
+**For train, run "train.py".**
 
 **For test, please following steps in ".\DPF_UpPanoGeneration_Imp-Align\Test_Result\results\introduction.txt"**
 
